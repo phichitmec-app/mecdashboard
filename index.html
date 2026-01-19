@@ -110,29 +110,32 @@
         </div>
     </main>
 
-    <script>
+ <script>
         // --- 1. CONFIGURATION ---
-        const SUPABASE_URL = 'https://blpdvcktvegmbizmebjk.supabase.co'; // 🔴 แก้ตรงนี้
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGR2Y2t0dmVnbWJpem1lYmprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyODcwNzIsImV4cCI6MjA4Mzg2MzA3Mn0.N8ZHXZAf30nhzU0dBbPEFpmGaXDAN4jwSSK_fM6_TBc'; // 🔴 แก้ตรงนี้
-        const TABLE_NAME = 'mec_student'; // 🔴 แก้ชื่อตารางถ้าไม่ตรง (เช่น medical_students)
+        const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co'; // 🔴 อย่าลืมใส่ URL ของคุณ
+        const SUPABASE_KEY = 'YOUR_ANON_KEY'; // 🔴 อย่าลืมใส่ Key ของคุณ
+        const TABLE_NAME = 'students'; 
 
-        // Initialize Supabase
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // --- แก้ไขตรงนี้: เปลี่ยนชื่อตัวแปรเพื่อไม่ให้ชนกับ Library ---
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // Global Variables
         let allData = [];
-        let charts = {}; // เก็บ Object ของกราฟเพื่อ update ภายหลัง
+        let charts = {}; 
 
         // --- 2. MAIN LOGIC ---
         
         async function initDashboard() {
             try {
-                // ดึงข้อมูลทั้งหมดจาก Supabase
-                const { data, error } = await supabase
+                // ดึงข้อมูลทั้งหมดจาก Supabase (ใช้ตัวแปร db แทน)
+                const { data, error } = await db
                     .from(TABLE_NAME)
                     .select('*');
 
                 if (error) throw error;
+
+                // ตรวจสอบว่ามีข้อมูลมาจริงไหม
+                console.log("Data loaded:", data.length, "rows"); 
 
                 allData = data;
                 
@@ -145,26 +148,27 @@
 
             } catch (err) {
                 console.error('Error fetching data:', err);
-                alert('เกิดข้อผิดพลาดในการดึงข้อมูล: ' + err.message);
-                document.getElementById('loading').innerHTML = `<p class="text-red-500">โหลดข้อมูลไม่สำเร็จ กรุณาตรวจสอบ Console</p>`;
+                // แสดง Error บนหน้าเว็บเพื่อให้เห็นชัดๆ
+                document.getElementById('loading').innerHTML = `
+                    <div class="text-red-500 bg-red-50 p-4 rounded-lg">
+                        <p class="font-bold">เกิดข้อผิดพลาด!</p>
+                        <p>${err.message}</p>
+                        <p class="text-sm text-gray-500 mt-2">Check Console for details</p>
+                    </div>`;
             }
         }
 
-        // ฟังก์ชันอัปเดตหน้าจอ (เรียกเมื่อโหลดครั้งแรก หรือเมื่อ Filter เปลี่ยน)
+        // ฟังก์ชันอัปเดตหน้าจอ
         function updateDashboard() {
-            // 1. อ่านค่าจาก Checkbox Filter
             const checkboxes = document.querySelectorAll('.status-filter:checked');
             const selectedStatuses = Array.from(checkboxes).map(cb => cb.value);
 
-            // 2. กรองข้อมูล
-            // ถ้าข้อมูลใน DB เป็นค่าว่าง หรือ null เราจะถือว่าไม่ผ่าน Filter ไว้ก่อน
             const filteredData = allData.filter(item => {
-                const status = item.studystatus || ''; 
-                // ใช้ includes เช็คว่า status ของคนนี้ อยู่ในกลุ่มที่เราติ๊กเลือกไหม
+                // ป้องกันกรณีค่าเป็น null หรือ undefined
+                const status = item.studystatus || 'ไม่ระบุ'; 
                 return selectedStatuses.includes(status);
             });
 
-            // 3. Render ส่วนต่างๆ
             renderKPI(filteredData);
             renderChartYears(filteredData);
             renderChartExams(filteredData);
@@ -175,33 +179,27 @@
         // --- 3. RENDER FUNCTIONS ---
 
         function renderKPI(data) {
-            // KPI 1: Total
             document.getElementById('kpi-total').innerText = data.length.toLocaleString();
 
-            // KPI 2: Health Risk (นับคนที่มีข้อมูลใน med_condition)
-            const healthRiskCount = data.filter(item => item.med_condition && item.med_condition !== '-').length;
+            const healthRiskCount = data.filter(item => item.med_condition && item.med_condition !== '-' && item.med_condition.trim() !== '').length;
             document.getElementById('kpi-health').innerText = healthRiskCount.toLocaleString();
 
-            // KPI 3: NL1 Pass Rate
             const nl1Takers = data.filter(item => item.nl1 === 'ผ่าน' || item.nl1 === 'ไม่ผ่าน');
             const nl1Pass = nl1Takers.filter(item => item.nl1 === 'ผ่าน').length;
             const nl1Rate = nl1Takers.length > 0 ? ((nl1Pass / nl1Takers.length) * 100).toFixed(1) : 0;
             document.getElementById('kpi-nl1').innerText = `${nl1Rate}%`;
 
-            // KPI 4: Graduated
             const gradCount = data.filter(item => item.studystatus === 'จบการศึกษา').length;
             document.getElementById('kpi-grad').innerText = gradCount.toLocaleString();
         }
 
         function renderChartYears(data) {
-            // เตรียมข้อมูล: Group by stu_year
             const yearCounts = {};
             data.forEach(item => {
-                const year = item.stu_year || 'Unknown';
+                const year = item.stu_year || 'ไม่ระบุ';
                 yearCounts[year] = (yearCounts[year] || 0) + 1;
             });
 
-            // เรียงลำดับปี
             const sortedYears = Object.keys(yearCounts).sort();
             const counts = sortedYears.map(y => yearCounts[y]);
 
@@ -212,12 +210,10 @@
                 colors: ['#3b82f6'],
                 plotOptions: { bar: { borderRadius: 4 } }
             };
-
             updateOrRenderChart('chart-years', options);
         }
 
         function renderChartExams(data) {
-            // นับ ผ่าน/ไม่ผ่าน ของแต่ละวิชา
             const exams = ['nl1', 'nl2', 'nl3osce', 'nl3meq', 'nl3longcase'];
             const labels = ['NL1', 'NL2', 'NL3 OSCE', 'NL3 MEQ', 'NL3 Longcase'];
             
@@ -238,28 +234,26 @@
                 ],
                 chart: { type: 'bar', height: 250, stacked: true, toolbar: { show: false } },
                 xaxis: { categories: labels },
-                colors: ['#22c55e', '#ef4444'], // เขียว, แดง
+                colors: ['#22c55e', '#ef4444'], 
                 plotOptions: { bar: { borderRadius: 4 } },
                 dataLabels: { enabled: false }
             };
-
             updateOrRenderChart('chart-exams', options);
         }
 
         function renderChartProvince(data) {
-            // Group by scholarship_province
             const provCounts = {};
             data.forEach(item => {
                 const prov = item.scholarship_province;
-                if(prov && prov !== '-') {
+                // กรองเฉพาะที่มีข้อมูลจังหวัด (ไม่เป็น null, ไม่เป็น '-', ไม่ว่าง)
+                if(prov && prov !== '-' && prov.trim() !== '') {
                     provCounts[prov] = (provCounts[prov] || 0) + 1;
                 }
             });
 
-            // Sort เอา Top 10
             const sortedProv = Object.entries(provCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10);
+                .sort((a, b) => b[1] - a[1]) // เรียงมากไปน้อย
+                .slice(0, 10); // เอาแค่ 10 อันดับแรก
             
             const categories = sortedProv.map(item => item[0]);
             const counts = sortedProv.map(item => item[1]);
@@ -271,12 +265,10 @@
                 xaxis: { categories: categories },
                 colors: ['#8b5cf6']
             };
-
             updateOrRenderChart('chart-province', options);
         }
 
         function renderChartScholarship(data) {
-            // Group by scholarship_type
             const scholarCounts = {};
             data.forEach(item => {
                 const type = item.scholarship_type || 'ไม่ระบุ';
@@ -290,11 +282,9 @@
                 colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1'],
                 legend: { position: 'bottom' }
             };
-
             updateOrRenderChart('chart-scholarship', options);
         }
 
-        // Utility: สร้างหรืออัปเดตกราฟ (เพื่อไม่ให้กราฟซ้อนกัน)
         function updateOrRenderChart(id, options) {
             if (charts[id]) {
                 charts[id].updateOptions(options);
@@ -304,18 +294,12 @@
             }
         }
 
-        // --- 4. EVENT LISTENERS ---
-        
-        // เมื่อ DOM โหลดเสร็จ ให้เริ่มทำงาน
         document.addEventListener('DOMContentLoaded', () => {
             initDashboard();
-
-            // ผูก Event กับ Checkbox ทุกตัว
             document.querySelectorAll('.status-filter').forEach(cb => {
                 cb.addEventListener('change', updateDashboard);
             });
         });
-
     </script>
 </body>
 </html>
