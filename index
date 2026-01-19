@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Student Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
+        .card { @apply bg-white rounded-lg shadow-md p-6; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">📊 MedSchool Dashboard</h1>
+                    <p class="text-sm text-gray-500">ระบบติดตามข้อมูลนิสิตแพทย์และผลสัมฤทธิ์</p>
+                </div>
+
+                <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
+                    <p class="text-xs font-bold text-blue-600 mb-1 uppercase tracking-wider">กรองสถานะนิสิต (Filter Status):</p>
+                    <div class="flex flex-wrap gap-4" id="filter-container">
+                        <label class="inline-flex items-center cursor-pointer hover:bg-blue-100 px-2 py-1 rounded transition">
+                            <input type="checkbox" class="status-filter form-checkbox h-5 w-5 text-blue-600 rounded" value="กำลังศึกษา" checked>
+                            <span class="ml-2 text-sm text-gray-700">กำลังศึกษา</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer hover:bg-blue-100 px-2 py-1 rounded transition">
+                            <input type="checkbox" class="status-filter form-checkbox h-5 w-5 text-green-600 rounded" value="กำลังใช้ทุน" checked>
+                            <span class="ml-2 text-sm text-gray-700">กำลังใช้ทุน</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer hover:bg-blue-100 px-2 py-1 rounded transition">
+                            <input type="checkbox" class="status-filter form-checkbox h-5 w-5 text-purple-600 rounded" value="จบการศึกษา" checked>
+                            <span class="ml-2 text-sm text-gray-700">จบการศึกษา</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer hover:bg-blue-100 px-2 py-1 rounded transition">
+                            <input type="checkbox" class="status-filter form-checkbox h-5 w-5 text-red-600 rounded" value="ลาออก" checked>
+                            <span class="ml-2 text-sm text-gray-700">ลาออก</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div id="loading" class="text-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-500">กำลังดึงข้อมูลจาก Database...</p>
+        </div>
+
+        <div id="dashboard-content" class="hidden space-y-6">
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="card border-l-4 border-blue-500">
+                    <p class="text-sm text-gray-500">นิสิตทั้งหมด (ตามตัวกรอง)</p>
+                    <h2 class="text-3xl font-bold text-gray-800" id="kpi-total">0</h2>
+                </div>
+                <div class="card border-l-4 border-red-400">
+                    <p class="text-sm text-gray-500">กลุ่มเสี่ยงด้านสุขภาพ</p>
+                    <h2 class="text-3xl font-bold text-gray-800" id="kpi-health">0</h2>
+                    <p class="text-xs text-gray-400 mt-1">มีประวัติโรคประจำตัว</p>
+                </div>
+                <div class="card border-l-4 border-green-500">
+                    <p class="text-sm text-gray-500">ผ่าน NL1 (ล่าสุด)</p>
+                    <h2 class="text-3xl font-bold text-gray-800" id="kpi-nl1">0%</h2>
+                </div>
+                <div class="card border-l-4 border-purple-500">
+                    <p class="text-sm text-gray-500">จบการศึกษาแล้ว</p>
+                    <h2 class="text-3xl font-bold text-gray-800" id="kpi-grad">0</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="card lg:col-span-1">
+                    <h3 class="text-lg font-bold text-gray-700 mb-4">📅 จำนวนนิสิตแบ่งตามรุ่นปี</h3>
+                    <div id="chart-years" class="h-64"></div>
+                </div>
+                
+                <div class="card lg:col-span-2">
+                    <h3 class="text-lg font-bold text-gray-700 mb-4">🏆 ผลการสอบใบประกอบวิชาชีพ (NL)</h3>
+                    <div id="chart-exams" class="h-64"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="card">
+                    <h3 class="text-lg font-bold text-gray-700 mb-4">🗺️ 10 อันดับ จังหวัดที่ไปใช้ทุน</h3>
+                    <div id="chart-province" class="h-80"></div>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-lg font-bold text-gray-700 mb-4">🎓 สัดส่วนประเภททุน</h3>
+                    <div id="chart-scholarship" class="h-80 flex items-center justify-center"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- 1. CONFIGURATION ---
+        const SUPABASE_URL = 'https://blpdvcktvegmbizmebjk.supabase.co'; // 🔴 แก้ตรงนี้
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGR2Y2t0dmVnbWJpem1lYmprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyODcwNzIsImV4cCI6MjA4Mzg2MzA3Mn0.N8ZHXZAf30nhzU0dBbPEFpmGaXDAN4jwSSK_fM6_TBc'; // 🔴 แก้ตรงนี้
+        const TABLE_NAME = 'students'; // 🔴 แก้ชื่อตารางถ้าไม่ตรง (เช่น medical_students)
+
+        // Initialize Supabase
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Global Variables
+        let allData = [];
+        let charts = {}; // เก็บ Object ของกราฟเพื่อ update ภายหลัง
+
+        // --- 2. MAIN LOGIC ---
+        
+        async function initDashboard() {
+            try {
+                // ดึงข้อมูลทั้งหมดจาก Supabase
+                const { data, error } = await supabase
+                    .from(TABLE_NAME)
+                    .select('*');
+
+                if (error) throw error;
+
+                allData = data;
+                
+                // เริ่มต้นแสดงผล
+                updateDashboard();
+
+                // ปิด Loading เปิด Content
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('dashboard-content').classList.remove('hidden');
+
+            } catch (err) {
+                console.error('Error fetching data:', err);
+                alert('เกิดข้อผิดพลาดในการดึงข้อมูล: ' + err.message);
+                document.getElementById('loading').innerHTML = `<p class="text-red-500">โหลดข้อมูลไม่สำเร็จ กรุณาตรวจสอบ Console</p>`;
+            }
+        }
+
+        // ฟังก์ชันอัปเดตหน้าจอ (เรียกเมื่อโหลดครั้งแรก หรือเมื่อ Filter เปลี่ยน)
+        function updateDashboard() {
+            // 1. อ่านค่าจาก Checkbox Filter
+            const checkboxes = document.querySelectorAll('.status-filter:checked');
+            const selectedStatuses = Array.from(checkboxes).map(cb => cb.value);
+
+            // 2. กรองข้อมูล
+            // ถ้าข้อมูลใน DB เป็นค่าว่าง หรือ null เราจะถือว่าไม่ผ่าน Filter ไว้ก่อน
+            const filteredData = allData.filter(item => {
+                const status = item.studystatus || ''; 
+                // ใช้ includes เช็คว่า status ของคนนี้ อยู่ในกลุ่มที่เราติ๊กเลือกไหม
+                return selectedStatuses.includes(status);
+            });
+
+            // 3. Render ส่วนต่างๆ
+            renderKPI(filteredData);
+            renderChartYears(filteredData);
+            renderChartExams(filteredData);
+            renderChartProvince(filteredData);
+            renderChartScholarship(filteredData);
+        }
+
+        // --- 3. RENDER FUNCTIONS ---
+
+        function renderKPI(data) {
+            // KPI 1: Total
+            document.getElementById('kpi-total').innerText = data.length.toLocaleString();
+
+            // KPI 2: Health Risk (นับคนที่มีข้อมูลใน med_condition)
+            const healthRiskCount = data.filter(item => item.med_condition && item.med_condition !== '-').length;
+            document.getElementById('kpi-health').innerText = healthRiskCount.toLocaleString();
+
+            // KPI 3: NL1 Pass Rate
+            const nl1Takers = data.filter(item => item.nl1 === 'ผ่าน' || item.nl1 === 'ไม่ผ่าน');
+            const nl1Pass = nl1Takers.filter(item => item.nl1 === 'ผ่าน').length;
+            const nl1Rate = nl1Takers.length > 0 ? ((nl1Pass / nl1Takers.length) * 100).toFixed(1) : 0;
+            document.getElementById('kpi-nl1').innerText = `${nl1Rate}%`;
+
+            // KPI 4: Graduated
+            const gradCount = data.filter(item => item.studystatus === 'จบการศึกษา').length;
+            document.getElementById('kpi-grad').innerText = gradCount.toLocaleString();
+        }
+
+        function renderChartYears(data) {
+            // เตรียมข้อมูล: Group by stu_year
+            const yearCounts = {};
+            data.forEach(item => {
+                const year = item.stu_year || 'Unknown';
+                yearCounts[year] = (yearCounts[year] || 0) + 1;
+            });
+
+            // เรียงลำดับปี
+            const sortedYears = Object.keys(yearCounts).sort();
+            const counts = sortedYears.map(y => yearCounts[y]);
+
+            const options = {
+                series: [{ name: 'จำนวนนิสิต', data: counts }],
+                chart: { type: 'bar', height: 250, toolbar: { show: false } },
+                xaxis: { categories: sortedYears },
+                colors: ['#3b82f6'],
+                plotOptions: { bar: { borderRadius: 4 } }
+            };
+
+            updateOrRenderChart('chart-years', options);
+        }
+
+        function renderChartExams(data) {
+            // นับ ผ่าน/ไม่ผ่าน ของแต่ละวิชา
+            const exams = ['nl1', 'nl2', 'nl3osce', 'nl3meq', 'nl3longcase'];
+            const labels = ['NL1', 'NL2', 'NL3 OSCE', 'NL3 MEQ', 'NL3 Longcase'];
+            
+            const passData = [];
+            const failData = [];
+
+            exams.forEach(examField => {
+                const pass = data.filter(d => d[examField] === 'ผ่าน').length;
+                const fail = data.filter(d => d[examField] === 'ไม่ผ่าน').length;
+                passData.push(pass);
+                failData.push(fail);
+            });
+
+            const options = {
+                series: [
+                    { name: 'ผ่าน', data: passData },
+                    { name: 'ไม่ผ่าน', data: failData }
+                ],
+                chart: { type: 'bar', height: 250, stacked: true, toolbar: { show: false } },
+                xaxis: { categories: labels },
+                colors: ['#22c55e', '#ef4444'], // เขียว, แดง
+                plotOptions: { bar: { borderRadius: 4 } },
+                dataLabels: { enabled: false }
+            };
+
+            updateOrRenderChart('chart-exams', options);
+        }
+
+        function renderChartProvince(data) {
+            // Group by scholarship_province
+            const provCounts = {};
+            data.forEach(item => {
+                const prov = item.scholarship_province;
+                if(prov && prov !== '-') {
+                    provCounts[prov] = (provCounts[prov] || 0) + 1;
+                }
+            });
+
+            // Sort เอา Top 10
+            const sortedProv = Object.entries(provCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+            
+            const categories = sortedProv.map(item => item[0]);
+            const counts = sortedProv.map(item => item[1]);
+
+            const options = {
+                series: [{ name: 'จำนวน', data: counts }],
+                chart: { type: 'bar', height: 320, toolbar: { show: false } },
+                plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
+                xaxis: { categories: categories },
+                colors: ['#8b5cf6']
+            };
+
+            updateOrRenderChart('chart-province', options);
+        }
+
+        function renderChartScholarship(data) {
+            // Group by scholarship_type
+            const scholarCounts = {};
+            data.forEach(item => {
+                const type = item.scholarship_type || 'ไม่ระบุ';
+                scholarCounts[type] = (scholarCounts[type] || 0) + 1;
+            });
+
+            const options = {
+                series: Object.values(scholarCounts),
+                labels: Object.keys(scholarCounts),
+                chart: { type: 'donut', height: 320 },
+                colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1'],
+                legend: { position: 'bottom' }
+            };
+
+            updateOrRenderChart('chart-scholarship', options);
+        }
+
+        // Utility: สร้างหรืออัปเดตกราฟ (เพื่อไม่ให้กราฟซ้อนกัน)
+        function updateOrRenderChart(id, options) {
+            if (charts[id]) {
+                charts[id].updateOptions(options);
+            } else {
+                charts[id] = new ApexCharts(document.querySelector(`#${id}`), options);
+                charts[id].render();
+            }
+        }
+
+        // --- 4. EVENT LISTENERS ---
+        
+        // เมื่อ DOM โหลดเสร็จ ให้เริ่มทำงาน
+        document.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+
+            // ผูก Event กับ Checkbox ทุกตัว
+            document.querySelectorAll('.status-filter').forEach(cb => {
+                cb.addEventListener('change', updateDashboard);
+            });
+        });
+
+    </script>
+</body>
+</html>
