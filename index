@@ -114,7 +114,7 @@
         // --- 1. CONFIGURATION ---
         const SUPABASE_URL = 'https://blpdvcktvegmbizmebjk.supabase.co'; // 🔴 แก้ตรงนี้
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGR2Y2t0dmVnbWJpem1lYmprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyODcwNzIsImV4cCI6MjA4Mzg2MzA3Mn0.N8ZHXZAf30nhzU0dBbPEFpmGaXDAN4jwSSK_fM6_TBc'; // 🔴 แก้ตรงนี้
-        const TABLE_NAME = 'students'; // 🔴 แก้ชื่อตารางถ้าไม่ตรง (เช่น medical_students)
+        const TABLE_NAME = 'mec_student'; // 🔴 แก้ชื่อตารางถ้าไม่ตรง (เช่น medical_students)
 
         // Initialize Supabase
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
