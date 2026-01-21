@@ -3,303 +3,751 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Student Dashboard</title>
+    <title>MedSchool Insight Dashboard</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Sarabun', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 
+                            600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
-        .card { @apply bg-white rounded-lg shadow-md p-6; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .tab-btn.active {
+            background-color: #eff6ff; color: #1d4ed8; border-bottom: 2px solid #2563eb; font-weight: 600;
+        }
+        .tab-btn { transition: all 0.2s ease; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen">
 
-    <div class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center py-4 gap-4">
                 
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">📊 MedSchool Dashboard</h1>
-                    <p class="text-sm text-gray-500">ระบบติดตามข้อมูลนิสิตแพทย์และผลสัมฤทธิ์</p>
-                </div>
-
-                <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
-                    <p class="text-xs font-bold text-blue-600 mb-1 uppercase tracking-wider">กรองสถานะนิสิต (Filter Status):</p>
-                    <div class="flex flex-wrap gap-4" id="filter-container">
-                        <label class="inline-flex items-center cursor-pointer hover:bg-blue-100 px-2 py-1 rounded transition">
-                            <input type="checkbox" class="status-filter form-checkbox h-5 w-5 text-blue-600 rounded" value="กำลังศึกษา" checked>
-                            <span class="ml-2 text-sm text-gray-700">กำลังศึกษา</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer hover:bg-blue-100 px-2 py-1 rounded transition">
-                            <input type="checkbox" class="status-filter form-checkbox h-5 w-5 text-green-600 rounded" value="กำลังใช้ทุน" checked>
-                            <span class="ml-2 text-sm text-gray-700">กำลังใช้ทุน</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer hover:bg-blue-100 px-2 py-1 rounded transition">
-                            <input type="checkbox" class="status-filter form-checkbox h-5 w-5 text-purple-600 rounded" value="จบการศึกษา" checked>
-                            <span class="ml-2 text-sm text-gray-700">จบการศึกษา</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer hover:bg-blue-100 px-2 py-1 rounded transition">
-                            <input type="checkbox" class="status-filter form-checkbox h-5 w-5 text-red-600 rounded" value="ลาออก" checked>
-                            <span class="ml-2 text-sm text-gray-700">ลาออก</span>
-                        </label>
+                <div class="flex items-center gap-3 select-none">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-600 to-brand-800 flex items-center justify-center text-white shadow-lg">
+                        <i class="fa-solid fa-user-md text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-800 leading-tight">MedSchool <span class="text-brand-600">Insight</span></h1>
+                        <p class="text-xs text-slate-500 font-medium tracking-wide">SYSTEM DASHBOARD</p>
                     </div>
                 </div>
+
+                <div class="bg-slate-100/50 p-1.5 rounded-xl border border-slate-200 flex flex-wrap items-center gap-2">
+                    
+                    <div class="px-3 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-filter"></i> สถานะ:
+                    </div>
+                    
+                    <label class="cursor-pointer group relative">
+                        <input type="checkbox" class="status-filter peer sr-only" value="กำลังศึกษา" checked>
+                        <div class="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 bg-white border border-slate-200 transition-all peer-checked:bg-blue-100 peer-checked:text-blue-700 peer-checked:border-blue-200 hover:bg-slate-50">กำลังศึกษา</div>
+                    </label>
+                    <label class="cursor-pointer group relative">
+                        <input type="checkbox" class="status-filter peer sr-only" value="กำลังใช้ทุน" checked>
+                        <div class="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 bg-white border border-slate-200 transition-all peer-checked:bg-green-100 peer-checked:text-green-700 peer-checked:border-green-200 hover:bg-slate-50">ใช้ทุน</div>
+                    </label>
+                    <label class="cursor-pointer group relative">
+                        <input type="checkbox" class="status-filter peer sr-only" value="จบการศึกษา" checked>
+                        <div class="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 bg-white border border-slate-200 transition-all peer-checked:bg-purple-100 peer-checked:text-purple-700 peer-checked:border-purple-200 hover:bg-slate-50">จบแล้ว</div>
+                    </label>
+                    <label class="cursor-pointer group relative">
+                        <input type="checkbox" class="status-filter peer sr-only" value="ลาออก" checked>
+                        <div class="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 bg-white border border-slate-200 transition-all peer-checked:bg-red-100 peer-checked:text-red-700 peer-checked:border-red-200 hover:bg-slate-50">ลาออก</div>
+                    </label>
+                    
+                    <div class="h-6 w-px bg-slate-300 mx-2 hidden sm:block"></div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                            <i class="fa-regular fa-calendar"></i> รุ่น:
+                        </div>
+                        
+                        <div class="relative group-year-filter">
+                            <button id="year-dropdown-btn" class="flex items-center justify-between gap-2 bg-white border border-slate-200 text-slate-600 py-1.5 px-3 rounded-lg text-sm hover:border-brand-500 focus:ring-1 focus:ring-brand-500 transition min-w-[120px]">
+                                <span id="year-btn-text">ทุกรุ่น (All)</span>
+                                <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                            </button>
+
+                            <div id="year-dropdown-panel" class="hidden absolute top-full right-0 mt-2 w-48 bg-white border border-slate-200 shadow-xl rounded-xl z-[60] overflow-hidden">
+                                <div class="px-3 py-2 bg-slate-50 border-b border-slate-100 flex justify-between items-center text-xs">
+                                    <button id="btn-check-all" class="text-brand-600 hover:underline font-medium">เลือกทั้งหมด</button>
+                                    <button id="btn-clear-all" class="text-slate-400 hover:text-slate-600">ล้าง</button>
+                                </div>
+                                <div id="year-checkbox-container" class="max-h-60 overflow-y-auto p-2 space-y-1">
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1 mt-2 overflow-x-auto no-scrollbar">
+                <button onclick="switchTab('overview')" id="btn-overview" class="tab-btn active flex items-center gap-2 px-6 py-3 text-sm font-medium text-slate-500 hover:text-brand-600 hover:bg-slate-50 rounded-t-lg border-b-2 border-transparent">
+                    <i class="fa-solid fa-chart-pie"></i><span>ภาพรวม</span>
+                </button>
+                <button onclick="switchTab('academic')" id="btn-academic" class="tab-btn flex items-center gap-2 px-6 py-3 text-sm font-medium text-slate-500 hover:text-brand-600 hover:bg-slate-50 rounded-t-lg border-b-2 border-transparent">
+                    <i class="fa-solid fa-medal"></i><span>ผลการเรียน & NL</span>
+                </button>
+                <button onclick="switchTab('profile')" id="btn-profile" class="tab-btn flex items-center gap-2 px-6 py-3 text-sm font-medium text-slate-500 hover:text-brand-600 hover:bg-slate-50 rounded-t-lg border-b-2 border-transparent">
+                    <i class="fa-solid fa-users-viewfinder"></i><span>ฐานข้อมูลนิสิต</span>
+                </button>
             </div>
         </div>
-    </div>
+    </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         
-        <div id="loading" class="text-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p class="text-gray-500">กำลังดึงข้อมูลจาก Database...</p>
+        <div id="loading" class="flex flex-col items-center justify-center py-24 fade-in">
+            <div class="w-16 h-16 border-4 border-slate-200 border-t-brand-600 rounded-full animate-spin"></div>
+            <p class="mt-4 text-slate-500 font-medium animate-pulse">กำลังเชื่อมต่อฐานข้อมูล Supabase...</p>
         </div>
 
-        <div id="dashboard-content" class="hidden space-y-6">
+        <div id="tab-overview" class="tab-content hidden fade-in space-y-8">
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 border-l-4 border-l-slate-500">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider">นิสิตทั้งหมด</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="kpi-total">0</h3>
+                    <div class="mt-2 text-xs text-slate-400 text-right"><i class="fa-solid fa-users"></i> Total</div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 border-l-4 border-l-blue-500">
+                    <p class="text-blue-600 text-xs font-bold uppercase tracking-wider">กำลังศึกษา</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="kpi-studying">0</h3>
+                    <div class="mt-2 text-xs text-slate-400 text-right"><i class="fa-solid fa-book-open"></i> Studying</div>
+                </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="card border-l-4 border-blue-500">
-                    <p class="text-sm text-gray-500">นิสิตทั้งหมด (ตามตัวกรอง)</p>
-                    <h2 class="text-3xl font-bold text-gray-800" id="kpi-total">0</h2>
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 border-l-4 border-l-green-500">
+                    <p class="text-green-600 text-xs font-bold uppercase tracking-wider">กำลังใช้ทุน</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="kpi-intern">0</h3>
+                    <div class="mt-2 text-xs text-slate-400 text-right"><i class="fa-solid fa-user-doctor"></i> Intern</div>
                 </div>
-                <div class="card border-l-4 border-red-400">
-                    <p class="text-sm text-gray-500">กลุ่มเสี่ยงด้านสุขภาพ</p>
-                    <h2 class="text-3xl font-bold text-gray-800" id="kpi-health">0</h2>
-                    <p class="text-xs text-gray-400 mt-1">มีประวัติโรคประจำตัว</p>
+
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 border-l-4 border-l-purple-500">
+                    <p class="text-purple-600 text-xs font-bold uppercase tracking-wider">จบการศึกษา</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="kpi-grad">0</h3>
+                    <div class="mt-2 text-xs text-slate-400 text-right"><i class="fa-solid fa-graduation-cap"></i> Alumni</div>
                 </div>
-                <div class="card border-l-4 border-green-500">
-                    <p class="text-sm text-gray-500">ผ่าน NL1 (ล่าสุด)</p>
-                    <h2 class="text-3xl font-bold text-gray-800" id="kpi-nl1">0%</h2>
+
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 border-l-4 border-l-red-400">
+                    <p class="text-red-500 text-xs font-bold uppercase tracking-wider">จำนวนที่ลาออก</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="kpi-dropout-count">0</h3>
+                    <div class="mt-2 text-xs text-slate-400 text-right"><i class="fa-solid fa-user-xmark"></i> Drop-out</div>
                 </div>
-                <div class="card border-l-4 border-purple-500">
-                    <p class="text-sm text-gray-500">จบการศึกษาแล้ว</p>
-                    <h2 class="text-3xl font-bold text-gray-800" id="kpi-grad">0</h2>
-                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                    <i class="fa-regular fa-calendar text-brand-500"></i> จำนวนนิสิตแยกตามรุ่น (Cohort)
+                </h4>
+                <div id="chart-years" class="h-80"></div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="card lg:col-span-1">
-                    <h3 class="text-lg font-bold text-gray-700 mb-4">📅 จำนวนนิสิตแบ่งตามรุ่นปี</h3>
-                    <div id="chart-years" class="h-64"></div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-brand-500"></i> สถานะปัจจุบัน
+                    </h4>
+                    <div id="chart-status" class="h-64 flex items-center justify-center"></div>
                 </div>
-                
-                <div class="card lg:col-span-2">
-                    <h3 class="text-lg font-bold text-gray-700 mb-4">🏆 ผลการสอบใบประกอบวิชาชีพ (NL)</h3>
-                    <div id="chart-exams" class="h-64"></div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-heart-pulse text-brand-500"></i> สิทธิการรักษา
+                    </h4>
+                    <div id="chart-rights" class="h-64 flex items-center justify-center"></div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-sack-dollar text-brand-500"></i> ทุนปัจจุบัน
+                    </h4>
+                    <div id="chart-scholarship-type" class="h-64 flex items-center justify-center"></div>
+                </div>
+            </div>
+
+             <div class="grid grid-cols-1 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-brand-500"></i> 10 อันดับ จังหวัดที่ไปใช้ทุน</h4>
+                    <div id="chart-province" class="h-80"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-academic" class="tab-content hidden fade-in space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-gradient-to-br from-blue-50 to-white rounded-xl p-5 border border-blue-100 text-center">
+                    <h5 class="text-blue-600 font-bold mb-1">NL1 Pass Rate</h5>
+                    <div class="text-3xl font-extrabold text-slate-800" id="kpi-nl1">0%</div>
+                </div>
+                <div class="bg-gradient-to-br from-indigo-50 to-white rounded-xl p-5 border border-indigo-100 text-center">
+                    <h5 class="text-indigo-600 font-bold mb-1">NL2 Pass Rate</h5>
+                    <div class="text-3xl font-extrabold text-slate-800" id="kpi-nl2">0%</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-50 to-white rounded-xl p-5 border border-purple-100 text-center">
+                    <h5 class="text-purple-600 font-bold mb-1">NL3 Pass Rate</h5>
+                    <div class="text-3xl font-extrabold text-slate-800" id="kpi-nl3">0%</div>
+                </div>
+                <div class="bg-gradient-to-br from-emerald-50 to-white rounded-xl p-5 border border-emerald-100 text-center">
+                    <h5 class="text-emerald-600 font-bold mb-1">CE Overall</h5>
+                    <div class="text-3xl font-extrabold text-slate-800" id="kpi-ce">0%</div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="card">
-                    <h3 class="text-lg font-bold text-gray-700 mb-4">🗺️ 10 อันดับ จังหวัดที่ไปใช้ทุน</h3>
-                    <div id="chart-province" class="h-80"></div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h4 class="font-bold text-slate-700 mb-4">ผลสอบใบประกอบวิชาชีพ (NL Summary)</h4>
+                    <div id="chart-nl-stack" class="h-80"></div>
                 </div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h4 class="font-bold text-slate-700 mb-4">แนวโน้มผลสอบ NL1 แยกตามรุ่น</h4>
+                    <div id="chart-cohort-nl1" class="h-80"></div>
+                </div>
+            </div>
+        </div>
 
-                <div class="card">
-                    <h3 class="text-lg font-bold text-gray-700 mb-4">🎓 สัดส่วนประเภททุน</h3>
-                    <div id="chart-scholarship" class="h-80 flex items-center justify-center"></div>
+        <div id="tab-profile" class="tab-content hidden fade-in space-y-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-red-50 rounded-xl p-6 border border-red-100 flex items-center gap-5">
+                    <div class="bg-white p-4 rounded-full text-red-500 shadow-sm"><i class="fa-solid fa-heart-pulse text-2xl"></i></div>
+                    <div>
+                        <div class="text-4xl font-bold text-slate-800" id="kpi-health-risk">0</div>
+                        <div class="text-sm text-red-600 font-semibold mt-1">นิสิตกลุ่มเสี่ยง (มีโรคประจำตัว)</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 md:col-span-2">
+                    <h4 class="font-bold text-slate-700 mb-2"><i class="fa-solid fa-notes-medical text-brand-500 mr-2"></i>โรคประจำตัวที่พบบ่อย (Top Medical Conditions)</h4>
+                    <div id="chart-diseases" class="h-40"></div>
                 </div>
             </div>
 
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <h4 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-list text-brand-500 mr-2"></i> รายชื่อนิสิต</h4>
+                    <div class="relative w-full md:w-72">
+                        <input type="text" id="search-input" placeholder="ค้นหา ชื่อ, รหัส, รุ่น..." 
+                               class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-brand-500 text-sm">
+                        <i class="fa-solid fa-search absolute left-3 top-2.5 text-slate-400"></i>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-200 text-sm">
+                        <thead class="bg-slate-50/80">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">รุ่น</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">รหัสนิสิต</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">ชื่อ-สกุล</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">ชื่อเล่น</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">สิทธิรักษา</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">จังหวัดใช้ทุน</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">สาขา</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">ที่ปรึกษา</th>
+                                <th class="px-6 py-3 text-center font-semibold text-slate-600">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body" class="bg-white divide-y divide-slate-100">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-slate-50 p-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="text-xs text-slate-500" id="table-info">
+                        แสดง 0-0 จาก 0 รายการ
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-prev" class="px-3 py-1 rounded border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 text-xs font-medium">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> ก่อนหน้า
+                        </button>
+                        <span id="page-display" class="text-xs font-bold text-slate-700 px-2">หน้า 1</span>
+                        <button id="btn-next" class="px-3 py-1 rounded border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 text-xs font-medium">
+                            ถัดไป <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
- <script>
-        // --- 1. CONFIGURATION ---
-        const SUPABASE_URL = 'https://blpdvcktvegmbizmebjk.supabase.co'; // 🔴 อย่าลืมใส่ URL ของคุณ
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGR2Y2t0dmVnbWJpem1lYmprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyODcwNzIsImV4cCI6MjA4Mzg2MzA3Mn0.N8ZHXZAf30nhzU0dBbPEFpmGaXDAN4jwSSK_fM6_TBc'; // 🔴 อย่าลืมใส่ Key ของคุณ
-        const TABLE_NAME = 'mec_student'; 
+    <footer class="bg-slate-900 text-slate-300 py-6 border-t-4 border-brand-600 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-xs text-slate-500">&copy; 2024 MedSchool Dashboard. System v3.0</p>
+        </div>
+    </footer>
 
-        // --- แก้ไขตรงนี้: เปลี่ยนชื่อตัวแปรเพื่อไม่ให้ชนกับ Library ---
+    <script>
+        // --- 1. CONFIGURATION ---
+        const SUPABASE_URL = 'https://blpdvcktvegmbizmebjk.supabase.co'; // 🔴 อย่าลืมแก้ตรงนี้
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJscGR2Y2t0dmVnbWJpem1lYmprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyODcwNzIsImV4cCI6MjA4Mzg2MzA3Mn0.N8ZHXZAf30nhzU0dBbPEFpmGaXDAN4jwSSK_fM6_TBc'; // 🔴 อย่าลืมแก้ตรงนี้
+        const TABLE_NAME = 'mec_student';
+
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Global Variables
+        // Global State
         let allData = [];
-        let charts = {}; 
-
-        // --- 2. MAIN LOGIC ---
+        let filteredData = [];
+        let charts = {};
         
-        async function initDashboard() {
-            try {
-                // ดึงข้อมูลทั้งหมดจาก Supabase (ใช้ตัวแปร db แทน)
-                const { data, error } = await db
-                    .from(TABLE_NAME)
-                    .select('*');
+        // Pagination State
+        let currentPage = 1;
+        const rowsPerPage = 10;
 
-                if (error) throw error;
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchData();
+            switchTab('overview');
+            
+            // Listeners
+            document.querySelectorAll('.status-filter').forEach(cb => cb.addEventListener('change', updateDashboard));
 
-                // ตรวจสอบว่ามีข้อมูลมาจริงไหม
-                console.log("Data loaded:", data.length, "rows"); 
+            // --- Logic สำหรับ Custom Dropdown ---
+            const yearBtn = document.getElementById('year-dropdown-btn');
+            const yearPanel = document.getElementById('year-dropdown-panel');
 
-                allData = data;
-                
-                // เริ่มต้นแสดงผล
+            // 1. กดปุ่มเพื่อ เปิด/ปิด Panel
+            yearBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                yearPanel.classList.toggle('hidden');
+            });
+
+            // 2. คลิกที่อื่นเพื่อปิด Panel
+            document.addEventListener('click', (e) => {
+                if (!yearBtn.contains(e.target) && !yearPanel.contains(e.target)) {
+                    yearPanel.classList.add('hidden');
+                }
+            });
+
+            // 3. กดปุ่ม "เลือกทั้งหมด"
+            document.getElementById('btn-check-all').addEventListener('click', () => {
+                document.querySelectorAll('.year-checkbox').forEach(cb => cb.checked = true);
                 updateDashboard();
+            });
 
-                // ปิด Loading เปิด Content
+            // 4. กดปุ่ม "ล้าง"
+            document.getElementById('btn-clear-all').addEventListener('click', () => {
+                document.querySelectorAll('.year-checkbox').forEach(cb => cb.checked = false);
+                updateDashboard();
+            });
+
+            // 5. เมื่อติ๊ก Checkbox แต่ละตัว ให้ update dashboard ทันที
+            // (ใช้ Event Delegation เพราะ Checkbox ถูกสร้างทีหลัง)
+            document.getElementById('year-checkbox-container').addEventListener('change', (e) => {
+                if(e.target.classList.contains('year-checkbox')) {
+                    updateDashboard();
+                }
+            });
+            
+            document.getElementById('search-input').addEventListener('keyup', () => {
+                currentPage = 1; // Reset to page 1 on search
+                renderTable();            
+            });
+            
+            // Pagination Listeners
+            document.getElementById('btn-prev').addEventListener('click', () => {
+                if(currentPage > 1) { currentPage--; renderTable(); }
+            });
+            document.getElementById('btn-next').addEventListener('click', () => {
+                const totalPages = Math.ceil(getTableMatches().length / rowsPerPage);
+                if(currentPage < totalPages) { currentPage++; renderTable(); }
+            });
+        });
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${tabName}`).classList.add('active');
+            setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 100);
+        }
+
+        // ฟังก์ชันสร้าง Checkbox รุ่น
+        function populateYearFilter() {
+            const container = document.getElementById('year-checkbox-container');
+            container.innerHTML = ''; // เคลียร์ของเก่า
+
+            // 1. ดึงข้อมูลรุ่น + Natural Sort
+            const years = [...new Set(allData.map(d => d.stu_year))];
+            const sortedYears = years
+                .filter(y => y && y !== '-' && y !== '')
+                .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+
+            // 2. สร้าง Checkbox
+            sortedYears.forEach(year => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center gap-2 px-2 py-1.5 hover:bg-slate-50 rounded cursor-pointer text-sm text-slate-700';
+                label.innerHTML = `
+                    <input type="checkbox" class="year-checkbox form-checkbox h-4 w-4 text-brand-600 rounded border-slate-300" value="${year}" checked>
+                    <span>${year}</span>
+                `;
+                container.appendChild(label);
+            });
+            
+            updateYearButtonText(); // อัปเดตข้อความบนปุ่ม
+        }
+
+        async function fetchData() {
+            try {
+                const { data, error } = await db.from(TABLE_NAME).select('*');
+                if (error) throw error;
+                allData = data;
+                populateYearFilter();
                 document.getElementById('loading').classList.add('hidden');
-                document.getElementById('dashboard-content').classList.remove('hidden');
-
+                updateDashboard();
             } catch (err) {
-                console.error('Error fetching data:', err);
-                // แสดง Error บนหน้าเว็บเพื่อให้เห็นชัดๆ
-                document.getElementById('loading').innerHTML = `
-                    <div class="text-red-500 bg-red-50 p-4 rounded-lg">
-                        <p class="font-bold">เกิดข้อผิดพลาด!</p>
-                        <p>${err.message}</p>
-                        <p class="text-sm text-gray-500 mt-2">Check Console for details</p>
-                    </div>`;
+                console.error(err);
+                document.getElementById('loading').innerHTML = `<div class="text-red-500">Error: ${err.message}</div>`;
             }
         }
 
-        // ฟังก์ชันอัปเดตหน้าจอ
         function updateDashboard() {
-            const checkboxes = document.querySelectorAll('.status-filter:checked');
-            const selectedStatuses = Array.from(checkboxes).map(cb => cb.value);
+            // 1. Status Checkbox
+            const statusBoxes = document.querySelectorAll('.status-filter:checked');
+            const selectedStatuses = Array.from(statusBoxes).map(cb => cb.value);
 
-            const filteredData = allData.filter(item => {
-                // ป้องกันกรณีค่าเป็น null หรือ undefined
-                const status = item.studystatus || 'ไม่ระบุ'; 
-                return selectedStatuses.includes(status);
+            // 2. Year Checkbox (Multi-select) 🔴 แก้ตรงนี้
+            const yearBoxes = document.querySelectorAll('.year-checkbox:checked');
+            const selectedYears = Array.from(yearBoxes).map(cb => cb.value);
+
+            // อัปเดตข้อความบนปุ่มกด
+            updateYearButtonText(selectedYears.length, document.querySelectorAll('.year-checkbox').length);
+
+            // 3. กรองข้อมูล
+            filteredData = allData.filter(item => {
+                const status = item.studystatus || 'ไม่ระบุ';
+                const year = item.stu_year || '';
+
+                const matchStatus = selectedStatuses.includes(status);
+                
+                // เช็คว่ารุ่นของคนนี้ อยู่ในรายการที่ติ๊กเลือกไหม 🔴
+                const matchYear = selectedYears.includes(year);
+
+                return matchStatus && matchYear;
             });
 
-            renderKPI(filteredData);
-            renderChartYears(filteredData);
-            renderChartExams(filteredData);
-            renderChartProvince(filteredData);
-            renderChartScholarship(filteredData);
+            // Refresh Pages & Charts
+            currentPage = 1;
+            renderTab1_Overview(filteredData);
+            renderTab2_Academic(filteredData);
+            renderTab3_Profile(filteredData);
         }
 
-        // --- 3. RENDER FUNCTIONS ---
+        // ฟังก์ชันช่วยอัปเดตข้อความบนปุ่ม
+        function updateYearButtonText(selectedCount, totalCount) {
+            const btnText = document.getElementById('year-btn-text');
+            if (!btnText) return;
+            
+            // ถ้ายังไม่ได้ส่งค่ามา ให้ไปนับเอง
+            if (selectedCount === undefined) {
+                selectedCount = document.querySelectorAll('.year-checkbox:checked').length;
+                totalCount = document.querySelectorAll('.year-checkbox').length;
+            }
 
-        function renderKPI(data) {
+            if (selectedCount === totalCount || totalCount === 0) {
+                btnText.innerText = `ทุกรุ่น (${totalCount})`;
+                btnText.classList.remove('text-brand-600', 'font-bold');
+            } else if (selectedCount === 0) {
+                btnText.innerText = 'ไม่เลือกรุ่น';
+                btnText.classList.remove('text-brand-600', 'font-bold');
+            } else {
+                btnText.innerText = `เลือก ${selectedCount} รุ่น`;
+                btnText.classList.add('text-brand-600', 'font-bold'); // ไฮไลท์สีเมื่อมีการกรอง
+            }
+        }
+
+        // --- TAB 1: OVERVIEW ---
+       // --- TAB 1: OVERVIEW ---
+        function renderTab1_Overview(data) {
+            // 1. Total
             document.getElementById('kpi-total').innerText = data.length.toLocaleString();
+            
+            // 2. Studying (กำลังศึกษา) 🔵 แก้ไข: นับเฉพาะกำลังศึกษา
+            const studying = data.filter(d => d.studystatus === 'กำลังศึกษา').length;
+            document.getElementById('kpi-studying').innerText = studying.toLocaleString();
 
-            const healthRiskCount = data.filter(item => item.med_condition && item.med_condition !== '-' && item.med_condition.trim() !== '').length;
-            document.getElementById('kpi-health').innerText = healthRiskCount.toLocaleString();
+            // 3. Intern (กำลังใช้ทุน) 🟢 แก้ไข: นับเฉพาะกำลังใช้ทุน
+            const intern = data.filter(d => d.studystatus === 'กำลังใช้ทุน').length;
+            document.getElementById('kpi-intern').innerText = intern.toLocaleString();
 
-            const nl1Takers = data.filter(item => item.nl1 === 'ผ่าน' || item.nl1 === 'ไม่ผ่าน');
-            const nl1Pass = nl1Takers.filter(item => item.nl1 === 'ผ่าน').length;
-            const nl1Rate = nl1Takers.length > 0 ? ((nl1Pass / nl1Takers.length) * 100).toFixed(1) : 0;
-            document.getElementById('kpi-nl1').innerText = `${nl1Rate}%`;
+            // 4. Graduated (จบการศึกษา)
+            const grads = data.filter(d => d.studystatus === 'จบการศึกษา').length;
+            document.getElementById('kpi-grad').innerText = grads.toLocaleString();
 
-            const gradCount = data.filter(item => item.studystatus === 'จบการศึกษา').length;
-            document.getElementById('kpi-grad').innerText = gradCount.toLocaleString();
-        }
+            // 5. Drop-out Count (จำนวนคนลาออก)
+            const dropouts = data.filter(d => d.studystatus === 'ลาออก').length;
+            document.getElementById('kpi-dropout-count').innerText = dropouts.toLocaleString();
 
-        function renderChartYears(data) {
+            // --- Charts ---
+
+            // Chart 1: Cohort (Sorted Natural: NT-1 -> NT-10)
             const yearCounts = {};
-            data.forEach(item => {
-                const year = item.stu_year || 'ไม่ระบุ';
-                yearCounts[year] = (yearCounts[year] || 0) + 1;
+            data.forEach(d => {
+                let y = d.stu_year;
+                if(!y || y === '-') return;
+                yearCounts[y] = (yearCounts[y] || 0) + 1;
             });
+            
+            // เรียงลำดับแบบ Natural Sort (NT-1 มาก่อน NT-10)
+            const sortedYears = Object.keys(yearCounts).sort((a, b) => {
+                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+            });
+            const sortedCounts = sortedYears.map(y => yearCounts[y]);
 
-            const sortedYears = Object.keys(yearCounts).sort();
-            const counts = sortedYears.map(y => yearCounts[y]);
-
-            const options = {
-                series: [{ name: 'จำนวนนิสิต', data: counts }],
-                chart: { type: 'bar', height: 250, toolbar: { show: false } },
+            renderChart('chart-years', {
+                series: [{ name: 'จำนวนนิสิต', data: sortedCounts }],
+                chart: { type: 'bar', height: 300 },
                 xaxis: { categories: sortedYears },
                 colors: ['#3b82f6'],
-                plotOptions: { bar: { borderRadius: 4 } }
-            };
-            updateOrRenderChart('chart-years', options);
+                plotOptions: { bar: { columnWidth: '50%' } }
+            });
+
+            // Chart 2: Status
+            const statusCounts = countByGroup(data, 'studystatus');
+            renderChart('chart-status', {
+                series: Object.values(statusCounts),
+                labels: Object.keys(statusCounts),
+                chart: { type: 'donut', height: 250 },
+                colors: ['#3b82f6', '#10b981', '#a855f7', '#ef4444'],
+                legend: { position: 'bottom' }
+            });
+
+            // Chart 3: Healthcare Rights
+            const rightsCounts = countByGroup(data, 'healthcare_rights');
+            renderChart('chart-rights', {
+                series: Object.values(rightsCounts),
+                labels: Object.keys(rightsCounts),
+                chart: { type: 'donut', height: 250 },
+                colors: ['#0ea5e9', '#6366f1', '#8b5cf6', '#d946ef', '#f43f5e'],
+                legend: { position: 'bottom' }
+            });
+
+            // Chart 4: Scholarship Type
+            const scholarTypeCounts = countByGroup(data, 'scholarship_type');
+            renderChart('chart-scholarship-type', {
+                series: Object.values(scholarTypeCounts),
+                labels: Object.keys(scholarTypeCounts),
+                chart: { type: 'pie', height: 250 },
+                colors: ['#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#64748b'],
+                legend: { position: 'bottom' }
+            });
+
+            // Chart 5: Province
+            const provCounts = countByGroup(data, 'scholarship_province', 10);
+            renderChart('chart-province', {
+                series: [{ name: 'จำนวน', data: Object.values(provCounts) }],
+                chart: { type: 'bar', height: 300 },
+                plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
+                xaxis: { categories: Object.keys(provCounts) },
+                colors: ['#f59e0b']
+            });
         }
 
-        function renderChartExams(data) {
-            const exams = ['nl1', 'nl2', 'nl3osce', 'nl3meq', 'nl3longcase'];
-            const labels = ['NL1', 'NL2', 'NL3 OSCE', 'NL3 MEQ', 'NL3 Longcase'];
-            
-            const passData = [];
-            const failData = [];
+        // --- TAB 2 ---
+        function renderTab2_Academic(data) {
+            const calcPassRate = (field) => {
+                const takers = data.filter(d => d[field] && (d[field].startsWith('ผ่าน') || d[field].startsWith('ไม่ผ่าน')));
+                if(takers.length === 0) return '0%';
+                const pass = takers.filter(d => d[field].startsWith('ผ่าน')).length;
+                return ((pass / takers.length) * 100).toFixed(1) + '%';
+            }
 
-            exams.forEach(examField => {
-                const pass = data.filter(d => d[examField] === 'ผ่าน').length;
-                const fail = data.filter(d => d[examField] === 'ไม่ผ่าน').length;
+            document.getElementById('kpi-nl1').innerText = calcPassRate('nl1');
+            document.getElementById('kpi-nl2').innerText = calcPassRate('nl2');
+            document.getElementById('kpi-nl3').innerText = calcPassRate('nl3osce');
+            document.getElementById('kpi-ce').innerText = calcPassRate('ce3meq');
+
+            const exams = ['nl1', 'nl2', 'nl3osce', 'nl3meq'];
+            const labels = ['NL1', 'NL2', 'NL3 OSCE', 'NL3 MEQ'];
+            const passData = [], failData = [];
+
+            exams.forEach(field => {
+                const pass = data.filter(d => d[field] && d[field].startsWith('ผ่าน')).length;
+                const fail = data.filter(d => d[field] && d[field].startsWith('ไม่ผ่าน')).length;
                 passData.push(pass);
                 failData.push(fail);
             });
 
-            const options = {
-                series: [
-                    { name: 'ผ่าน', data: passData },
-                    { name: 'ไม่ผ่าน', data: failData }
-                ],
-                chart: { type: 'bar', height: 250, stacked: true, toolbar: { show: false } },
+            renderChart('chart-nl-stack', {
+                series: [{ name: 'ผ่าน', data: passData }, { name: 'ไม่ผ่าน', data: failData }],
+                chart: { type: 'bar', height: 300, stacked: true },
                 xaxis: { categories: labels },
-                colors: ['#22c55e', '#ef4444'], 
-                plotOptions: { bar: { borderRadius: 4 } },
-                dataLabels: { enabled: false }
-            };
-            updateOrRenderChart('chart-exams', options);
-        }
+                colors: ['#22c55e', '#ef4444']
+            });
 
-        function renderChartProvince(data) {
-            const provCounts = {};
-            data.forEach(item => {
-                const prov = item.scholarship_province;
-                // กรองเฉพาะที่มีข้อมูลจังหวัด (ไม่เป็น null, ไม่เป็น '-', ไม่ว่าง)
-                if(prov && prov !== '-' && prov.trim() !== '') {
-                    provCounts[prov] = (provCounts[prov] || 0) + 1;
+            const yearGroups = {};
+            data.forEach(d => {
+                if(!d.stu_year) return;
+                if(!yearGroups[d.stu_year]) yearGroups[d.stu_year] = { pass: 0, total: 0 };
+                if(d.nl1 && (d.nl1.startsWith('ผ่าน') || d.nl1.startsWith('ไม่ผ่าน'))) {
+                    yearGroups[d.stu_year].total++;
+                    if(d.nl1.startsWith('ผ่าน')) yearGroups[d.stu_year].pass++;
                 }
             });
-
-            const sortedProv = Object.entries(provCounts)
-                .sort((a, b) => b[1] - a[1]) // เรียงมากไปน้อย
-                .slice(0, 10); // เอาแค่ 10 อันดับแรก
-            
-            const categories = sortedProv.map(item => item[0]);
-            const counts = sortedProv.map(item => item[1]);
-
-            const options = {
-                series: [{ name: 'จำนวน', data: counts }],
-                chart: { type: 'bar', height: 320, toolbar: { show: false } },
-                plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
-                xaxis: { categories: categories },
-                colors: ['#8b5cf6']
-            };
-            updateOrRenderChart('chart-province', options);
-        }
-
-        function renderChartScholarship(data) {
-            const scholarCounts = {};
-            data.forEach(item => {
-                const type = item.scholarship_type || 'ไม่ระบุ';
-                scholarCounts[type] = (scholarCounts[type] || 0) + 1;
+            const sortedYears = Object.keys(yearGroups).sort();
+            const rates = sortedYears.map(y => {
+                const g = yearGroups[y];
+                return g.total > 0 ? ((g.pass / g.total) * 100).toFixed(1) : 0;
             });
 
-            const options = {
-                series: Object.values(scholarCounts),
-                labels: Object.keys(scholarCounts),
-                chart: { type: 'donut', height: 320 },
-                colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1'],
-                legend: { position: 'bottom' }
-            };
-            updateOrRenderChart('chart-scholarship', options);
+            renderChart('chart-cohort-nl1', {
+                series: [{ name: '% ผ่าน NL1', data: rates }],
+                chart: { type: 'line', height: 300 },
+                stroke: { curve: 'smooth', width: 3 },
+                xaxis: { categories: sortedYears },
+                colors: ['#6366f1'],
+                markers: { size: 5 }
+            });
         }
 
-        function updateOrRenderChart(id, options) {
+        // --- TAB 3 ---
+        function renderTab3_Profile(data) {
+            const risks = data.filter(d => d.med_condition && d.med_condition !== '-' && d.med_condition.trim() !== '').length;
+            document.getElementById('kpi-health-risk').innerText = risks.toLocaleString();
+
+            const diseases = countByGroup(data, 'med_condition', 10);
+            renderChart('chart-diseases', {
+                series: [{ name: 'จำนวน', data: Object.values(diseases) }],
+                chart: { type: 'bar', height: 160 },
+                xaxis: { categories: Object.keys(diseases) },
+                plotOptions: { bar: { borderRadius: 4, columnWidth: '50%', horizontal: true } },
+                colors: ['#f43f5e']
+            });
+            renderTable();
+        }
+
+        // --- TABLE LOGIC ---
+    // --- TABLE LOGIC ---
+        function getTableMatches() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            
+            // 1. กรองข้อมูลตามคำค้นหา (Search)
+            let matches = filteredData.filter(d => {
+                const text = `${d.student_id} ${d.fullname} ${d.nickname} ${d.stu_year} ${d.scholarship_province}`.toLowerCase();
+                return text.includes(search);
+            });
+
+            // 2. เรียงลำดับข้อมูล (Sorting)
+            return matches.sort((a, b) => {
+                // ระดับที่ 1: เรียงตามรุ่น (Natural Sort เพื่อให้ NT-1 มาก่อน NT-10)
+                const yearA = a.stu_year || '';
+                const yearB = b.stu_year || '';
+                const yearCompare = yearA.localeCompare(yearB, undefined, { numeric: true, sensitivity: 'base' });
+
+                // ระดับที่ 2: ถ้ารุ่นเท่ากัน -> ให้เรียงตามชื่อ-สกุล (ก-ฮ)
+                if (yearCompare === 0) {
+                    return (a.fullname || '').localeCompare(b.fullname || '', 'th');
+                }
+                
+                return yearCompare;
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            const matches = getTableMatches();
+            const totalItems = matches.length;
+            const totalPages = Math.ceil(totalItems / rowsPerPage);
+            
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIdx = (currentPage - 1) * rowsPerPage;
+            const endIdx = startIdx + rowsPerPage;
+            const pageItems = matches.slice(startIdx, endIdx);
+
+            pageItems.forEach(d => {
+                const tr = `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-50 last:border-0">
+                        <td class="px-6 py-4 text-slate-600 font-medium">${d.stu_year || '-'}</td>
+                        <td class="px-6 py-4 font-mono text-slate-500 font-semibold">${d.student_id || '-'}</td>
+                        <td class="px-6 py-4 text-slate-800 font-medium whitespace-nowrap">${d.fullname || '-'}</td>
+                        <td class="px-6 py-4 text-slate-500">${d.nickname || '-'}</td>
+                        <td class="px-6 py-4 text-slate-500 text-xs">${d.healthcare_rights || '-'}</td>
+                        <td class="px-6 py-4 text-slate-500 text-xs">${d.scholarship_province || '-'}</td>
+                        <td class="px-6 py-4 text-slate-500 text-xs">${d.major || '-'}</td>
+                        <td class="px-6 py-4 text-slate-500 text-xs">${d.advisor || '-'}</td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(d.studystatus)} whitespace-nowrap">${d.studystatus || 'ไม่ระบุ'}</span>
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', tr);
+            });
+
+            document.getElementById('table-info').innerText = totalItems > 0 
+                ? `แสดง ${startIdx + 1}-${Math.min(endIdx, totalItems)} จาก ${totalItems} รายการ`
+                : 'ไม่พบข้อมูล';
+            document.getElementById('page-display').innerText = `หน้า ${totalPages > 0 ? currentPage : 0} / ${totalPages}`;
+            document.getElementById('btn-prev').disabled = currentPage === 1 || totalItems === 0;
+            document.getElementById('btn-next').disabled = currentPage === totalPages || totalItems === 0;
+        }
+
+        // --- UTILS ---
+        function countByGroup(data, field, limit = 0) {
+            const counts = {};
+            data.forEach(d => {
+                let val = d[field];
+                if(!val || val === '-' || val === '' || val === 'null') return;
+                counts[val] = (counts[val] || 0) + 1;
+            });
+            const entries = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+            if(limit > 0) return Object.fromEntries(entries.slice(0, limit));
+            return Object.fromEntries(entries);
+        }
+
+        function getStatusColor(status) {
+            if(status === 'กำลังศึกษา') return 'bg-blue-100 text-blue-700';
+            if(status === 'กำลังใช้ทุน') return 'bg-green-100 text-green-700';
+            if(status === 'จบการศึกษา') return 'bg-purple-100 text-purple-700';
+            if(status === 'ลาออก') return 'bg-red-100 text-red-700';
+            return 'bg-slate-100 text-slate-600';
+        }
+
+        function renderChart(id, options) {
+            const baseOptions = {
+                toolbar: { show: false },
+                fontFamily: 'Sarabun, sans-serif',
+                dataLabels: { enabled: false }
+            };
+            const finalOptions = { ...baseOptions, ...options, chart: { ...baseOptions.chart, ...options.chart } };
+            
             if (charts[id]) {
-                charts[id].updateOptions(options);
+                charts[id].updateOptions(finalOptions);
             } else {
-                charts[id] = new ApexCharts(document.querySelector(`#${id}`), options);
+                charts[id] = new ApexCharts(document.querySelector(`#${id}`), finalOptions);
                 charts[id].render();
             }
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initDashboard();
-            document.querySelectorAll('.status-filter').forEach(cb => {
-                cb.addEventListener('change', updateDashboard);
-            });
-        });
     </script>
 </body>
 </html>
