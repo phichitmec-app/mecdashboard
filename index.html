@@ -202,53 +202,169 @@
             </div>
         </div>
 
-        <div id="tab-academic" class="tab-content hidden fade-in space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-gradient-to-br from-blue-50 to-white rounded-xl p-5 border border-blue-100 text-center">
-                    <h5 class="text-blue-600 font-bold mb-1">NL1 Pass Rate</h5>
-                    <div class="text-3xl font-extrabold text-slate-800" id="kpi-nl1">0%</div>
+<div id="tab-academic" class="tab-content hidden fade-in space-y-8">
+            
+            <div>
+                <h3 class="text-lg font-bold text-slate-700 mb-4 border-l-4 border-brand-500 pl-3">
+                    ใบประกอบวิชาชีพเวชกรรม (National License)
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase">NL1 Pass Rate</p>
+                            <h4 class="text-2xl font-bold text-brand-600 mt-1" id="kpi-nl1">0%</h4>
+                        </div>
+                        <div class="h-10 w-10 rounded-full bg-brand-50 flex items-center justify-center text-brand-500"><i class="fa-solid fa-brain"></i></div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase">NL2 Pass Rate</p>
+                            <h4 class="text-2xl font-bold text-indigo-600 mt-1" id="kpi-nl2">0%</h4>
+                        </div>
+                        <div class="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500"><i class="fa-solid fa-user-doctor"></i></div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase">NL3 (OSCE)</p>
+                            <h4 class="text-2xl font-bold text-purple-600 mt-1" id="kpi-nl3">0%</h4>
+                        </div>
+                        <div class="h-10 w-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-500"><i class="fa-solid fa-clipboard-check"></i></div>
+                    </div>
                 </div>
-                <div class="bg-gradient-to-br from-indigo-50 to-white rounded-xl p-5 border border-indigo-100 text-center">
-                    <h5 class="text-indigo-600 font-bold mb-1">NL2 Pass Rate</h5>
-                    <div class="text-3xl font-extrabold text-slate-800" id="kpi-nl2">0%</div>
-                </div>
-                <div class="bg-gradient-to-br from-purple-50 to-white rounded-xl p-5 border border-purple-100 text-center">
-                    <h5 class="text-purple-600 font-bold mb-1">NL3 Pass Rate</h5>
-                    <div class="text-3xl font-extrabold text-slate-800" id="kpi-nl3">0%</div>
-                </div>
-                <div class="bg-gradient-to-br from-emerald-50 to-white rounded-xl p-5 border border-emerald-100 text-center">
-                    <h5 class="text-emerald-600 font-bold mb-1">CE Overall</h5>
-                    <div class="text-3xl font-extrabold text-slate-800" id="kpi-ce">0%</div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h4 class="font-bold text-slate-700 mb-4 text-sm"><i class="fa-solid fa-chart-simple text-brand-500 mr-2"></i> ผลสอบ NL แยกรายวิชา (ละเอียด)</h4>
+                    <div id="chart-nl-detail" class="h-80"></div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                    <h4 class="font-bold text-slate-700 mb-4">ผลสอบใบประกอบวิชาชีพ (NL Summary)</h4>
-                    <div id="chart-nl-stack" class="h-80"></div>
+            <hr class="border-slate-200">
+
+            <div>
+                <h3 class="text-lg font-bold text-slate-700 mb-4 border-l-4 border-orange-500 pl-3">
+                    การสอบรวบยอด (Comprehensive Exam)
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase">CE1 Pass Rate</p>
+                            <h4 class="text-2xl font-bold text-orange-600 mt-1" id="kpi-ce1">0%</h4>
+                        </div>
+                        <div class="h-10 w-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">1</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase">CE2 Pass Rate</p>
+                            <h4 class="text-2xl font-bold text-orange-600 mt-1" id="kpi-ce2">0%</h4>
+                        </div>
+                        <div class="h-10 w-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">2</div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase">CE3 (OSCE)</p>
+                            <h4 class="text-2xl font-bold text-orange-600 mt-1" id="kpi-ce3">0%</h4>
+                        </div>
+                        <div class="h-10 w-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">3</div>
+                    </div>
                 </div>
+
                 <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                    <h4 class="font-bold text-slate-700 mb-4">แนวโน้มผลสอบ NL1 แยกตามรุ่น</h4>
-                    <div id="chart-cohort-nl1" class="h-80"></div>
+                    <h4 class="font-bold text-slate-700 mb-4 text-sm"><i class="fa-solid fa-list-check text-orange-500 mr-2"></i> ผลสอบ CE แยกรายวิชา (ละเอียด)</h4>
+                    <div id="chart-ce-detail" class="h-80"></div>
                 </div>
             </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden mt-8">
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <h4 class="font-bold text-slate-800"><i class="fa-solid fa-table-list text-slate-500 mr-2"></i> ตารางผลสอบรายบุคคล</h4>
+                    
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-500 uppercase">กรองผลสอบ:</span>
+                        <select id="exam-result-filter" class="bg-white border border-slate-300 text-slate-700 text-xs rounded-lg py-1.5 px-3 focus:outline-none focus:border-brand-500 shadow-sm cursor-pointer">
+                            <option value="all">แสดงทั้งหมด</option>
+                            <option value="fail" class="text-red-600 font-bold">⚠️ มีวิชาที่ "ไม่ผ่าน"</option>
+                            <option value="pass" class="text-green-600 font-bold">✅ มีวิชาที่ "ผ่าน"</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-200 text-xs">
+                        <thead class="bg-slate-100 text-slate-700">
+                            <tr>
+                                <th class="px-3 py-3 text-left font-bold sticky left-0 bg-slate-100 z-10 w-20">รุ่น</th>
+                                <th class="px-3 py-3 text-left font-bold sticky left-20 bg-slate-100 z-10 w-40 border-r border-slate-200">ชื่อ-สกุล</th>
+                                
+                                <th class="px-2 py-3 text-center font-bold bg-blue-50 text-blue-700">NL1</th>
+                                <th class="px-2 py-3 text-center font-bold bg-blue-50 text-blue-700">NL2</th>
+                                <th class="px-2 py-3 text-center font-bold bg-blue-50 text-blue-700">NL3 OSCE</th>
+                                <th class="px-2 py-3 text-center font-bold bg-blue-50 text-blue-700">NL3 MEQ</th>
+                                <th class="px-2 py-3 text-center font-bold bg-blue-50 text-blue-700 border-r border-slate-200">NL3 Longcase</th>
+                                
+                                <th class="px-2 py-3 text-center font-bold bg-orange-50 text-orange-700">CE1</th>
+                                <th class="px-2 py-3 text-center font-bold bg-orange-50 text-orange-700">CE2</th>
+                                <th class="px-2 py-3 text-center font-bold bg-orange-50 text-orange-700">CE3 OSCE</th>
+                                <th class="px-2 py-3 text-center font-bold bg-orange-50 text-orange-700">CE3 MEQ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="exam-table-body" class="bg-white divide-y divide-slate-100">
+                            </tbody>
+                    </table>
+		<div class="p-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-2 text-xs text-slate-500">
+                        <span>แสดงแถว:</span>
+                        <select id="rows-per-page-academic" class="bg-white border border-slate-300 text-slate-700 text-xs rounded py-1 px-2 focus:outline-none focus:border-brand-500">
+                            <option value="10">10</option>
+                            <option value="20" selected>20</option>
+                            <option value="30">30</option>
+                            <option value="40">40</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span id="table-info-academic">แสดง 0-0 จาก 0 รายการ</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button id="btn-prev-academic" class="px-3 py-1 rounded border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 text-xs font-medium transition">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> ก่อนหน้า
+                        </button>
+                        <span id="page-display-academic" class="text-xs font-bold text-slate-700 px-2">หน้า 1</span>
+                        <button id="btn-next-academic" class="px-3 py-1 rounded border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 text-xs font-medium transition">
+                            ถัดไป <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>                 </div>
+                <div class="p-3 bg-slate-50 text-center text-xs text-slate-400">
+                    แสดงผลทั้งหมดตามตัวกรอง (เรียงตามรุ่นและชื่อ)
+                </div>
+            </div>
+
         </div>
+
 
         <div id="tab-profile" class="tab-content hidden fade-in space-y-6">
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-red-50 rounded-xl p-6 border border-red-100 flex items-center gap-5">
-                    <div class="bg-white p-4 rounded-full text-red-500 shadow-sm"><i class="fa-solid fa-heart-pulse text-2xl"></i></div>
-                    <div>
-                        <div class="text-4xl font-bold text-slate-800" id="kpi-health-risk">0</div>
-                        <div class="text-sm text-red-600 font-semibold mt-1">นิสิตกลุ่มเสี่ยง (มีโรคประจำตัว)</div>
-                    </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h4 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-stethoscope text-brand-500"></i> 10 อันดับ สาขาที่ศึกษาต่อ
+                    </h4>
+                    <div id="chart-major" class="h-80"></div>
                 </div>
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 md:col-span-2">
-                    <h4 class="font-bold text-slate-700 mb-2"><i class="fa-solid fa-notes-medical text-brand-500 mr-2"></i>โรคประจำตัวที่พบบ่อย (Top Medical Conditions)</h4>
-                    <div id="chart-diseases" class="h-40"></div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h4 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-university text-brand-500"></i> 10 อันดับ มหาวิทยาลัย
+                    </h4>
+                    <div id="chart-university" class="h-80"></div>
                 </div>
+
             </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
 
             <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
                 <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -271,7 +387,7 @@
                                 <th class="px-6 py-3 text-left font-semibold text-slate-600">สิทธิรักษา</th>
                                 <th class="px-6 py-3 text-left font-semibold text-slate-600">จังหวัดใช้ทุน</th>
                                 <th class="px-6 py-3 text-left font-semibold text-slate-600">สาขา</th>
-                                <th class="px-6 py-3 text-left font-semibold text-slate-600">ที่ปรึกษา</th>
+                                <th class="px-6 py-3 text-left font-semibold text-slate-600">มหาวิทยาลัย</th>
                                 <th class="px-6 py-3 text-center font-semibold text-slate-600">สถานะ</th>
                             </tr>
                         </thead>
@@ -280,16 +396,25 @@
                     </table>
                 </div>
 
-                <div class="bg-slate-50 p-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="text-xs text-slate-500" id="table-info">
-                        แสดง 0-0 จาก 0 รายการ
+                <div class="p-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-2 text-xs text-slate-500">
+                        <span>แสดงแถว:</span>
+                        <select id="rows-per-page-profile" class="bg-white border border-slate-300 text-slate-700 text-xs rounded py-1 px-2 focus:outline-none focus:border-brand-500">
+                            <option value="10">10</option>
+                            <option value="20" selected>20</option>
+                            <option value="30">30</option>
+                            <option value="40">40</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span id="table-info-profile">แสดง 0-0 จาก 0 รายการ</span>
                     </div>
+
                     <div class="flex items-center gap-2">
-                        <button id="btn-prev" class="px-3 py-1 rounded border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 text-xs font-medium">
+                        <button id="btn-prev-profile" class="px-3 py-1 rounded border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 text-xs font-medium transition">
                             <i class="fa-solid fa-chevron-left mr-1"></i> ก่อนหน้า
                         </button>
-                        <span id="page-display" class="text-xs font-bold text-slate-700 px-2">หน้า 1</span>
-                        <button id="btn-next" class="px-3 py-1 rounded border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 text-xs font-medium">
+                        <span id="page-display-profile" class="text-xs font-bold text-slate-700 px-2">หน้า 1</span>
+                        <button id="btn-next-profile" class="px-3 py-1 rounded border border-slate-300 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-50 text-xs font-medium transition">
                             ถัดไป <i class="fa-solid fa-chevron-right ml-1"></i>
                         </button>
                     </div>
@@ -316,10 +441,14 @@
         let allData = [];
         let filteredData = [];
         let charts = {};
+	let examResultFilter = 'all'; // ค่าเริ่มต้น: แสดงทั้งหมด
         
-        // Pagination State
-        let currentPage = 1;
-        const rowsPerPage = 10;
+        // Pagination State (แยกกัน 2 หน้า)
+        let pageAcademic = 1;
+        let rowsAcademic = 20; // Default 20
+
+        let pageProfile = 1;
+        let rowsProfile = 20;  // Default 20
 
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', async () => {
@@ -371,15 +500,34 @@
                 renderTable();            
             });
             
-            // Pagination Listeners
-            document.getElementById('btn-prev').addEventListener('click', () => {
-                if(currentPage > 1) { currentPage--; renderTable(); }
+            // --- Pagination Listeners: Tab 2 (Academic) ---
+            document.getElementById('btn-prev-academic').addEventListener('click', () => changePage('academic', -1));
+            document.getElementById('btn-next-academic').addEventListener('click', () => changePage('academic', 1));
+            document.getElementById('rows-per-page-academic').addEventListener('change', (e) => {
+                rowsAcademic = parseInt(e.target.value);
+                pageAcademic = 1; // Reset หน้า
+                renderExamTable(filteredData);
             });
-            document.getElementById('btn-next').addEventListener('click', () => {
-                const totalPages = Math.ceil(getTableMatches().length / rowsPerPage);
-                if(currentPage < totalPages) { currentPage++; renderTable(); }
+
+	       // --- Listener สำหรับ Filter ผลสอบ (Tab 2) 🔴 เพิ่มใหม่ ---
+            document.getElementById('exam-result-filter').addEventListener('change', (e) => {
+                examResultFilter = e.target.value;
+                pageAcademic = 1; // Reset กลับหน้า 1
+                renderExamTable(filteredData);
+            });
+
+		
+
+            // --- Pagination Listeners: Tab 3 (Profile) ---
+            document.getElementById('btn-prev-profile').addEventListener('click', () => changePage('profile', -1));
+            document.getElementById('btn-next-profile').addEventListener('click', () => changePage('profile', 1));
+            document.getElementById('rows-per-page-profile').addEventListener('change', (e) => {
+                rowsProfile = parseInt(e.target.value);
+                pageProfile = 1; // Reset หน้า
+                renderTable();
             });
         });
+	
 
         window.switchTab = function(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -387,6 +535,18 @@
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`btn-${tabName}`).classList.add('active');
             setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 100);
+        }
+
+
+	// ฟังก์ชันเปลี่ยนหน้า (ใช้ร่วมกันเพื่อลดโค้ดซ้ำ)
+        function changePage(tab, direction) {
+            if (tab === 'academic') {
+                pageAcademic += direction;
+                renderExamTable(filteredData);
+            } else if (tab === 'profile') {
+                pageProfile += direction;
+                renderTable();
+            }
         }
 
         // ฟังก์ชันสร้าง Checkbox รุ่น
@@ -453,8 +613,10 @@
                 return matchStatus && matchYear;
             });
 
-            // Refresh Pages & Charts
-            currentPage = 1;
+            // Reset Pagination เมื่อมีการ Filter
+            pageAcademic = 1;
+            pageProfile = 1;
+
             renderTab1_Overview(filteredData);
             renderTab2_Academic(filteredData);
             renderTab3_Profile(filteredData);
@@ -560,18 +722,19 @@
             });
 
             // Chart 5: Province
-            const provCounts = countByGroup(data, 'scholarship_province', 10);
+            const provCounts = countByGroup(data, 'scholarship_province', 20);
             renderChart('chart-province', {
                 series: [{ name: 'จำนวน', data: Object.values(provCounts) }],
-                chart: { type: 'bar', height: 300 },
+                chart: { type: 'bar', height: 600 },
                 plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
                 xaxis: { categories: Object.keys(provCounts) },
                 colors: ['#f59e0b']
             });
         }
 
-        // --- TAB 2 ---
+        // --- TAB 2: ACADEMIC (UPDATED V.2) ---
         function renderTab2_Academic(data) {
+            // Helper: คำนวณ % ผ่าน
             const calcPassRate = (field) => {
                 const takers = data.filter(d => d[field] && (d[field].startsWith('ผ่าน') || d[field].startsWith('ไม่ผ่าน')));
                 if(takers.length === 0) return '0%';
@@ -579,67 +742,195 @@
                 return ((pass / takers.length) * 100).toFixed(1) + '%';
             }
 
+            // 1. Update KPIs
             document.getElementById('kpi-nl1').innerText = calcPassRate('nl1');
             document.getElementById('kpi-nl2').innerText = calcPassRate('nl2');
-            document.getElementById('kpi-nl3').innerText = calcPassRate('nl3osce');
-            document.getElementById('kpi-ce').innerText = calcPassRate('ce3meq');
+            document.getElementById('kpi-nl3').innerText = calcPassRate('nl3osce'); 
+            
+            document.getElementById('kpi-ce1').innerText = calcPassRate('ce1');
+            document.getElementById('kpi-ce2').innerText = calcPassRate('ce2');
+            document.getElementById('kpi-ce3').innerText = calcPassRate('ce3osce'); 
 
-            const exams = ['nl1', 'nl2', 'nl3osce', 'nl3meq'];
-            const labels = ['NL1', 'NL2', 'NL3 OSCE', 'NL3 MEQ'];
-            const passData = [], failData = [];
+            // 2. Chart: NL Details (5 Parts)
+            const nlExams = ['nl1', 'nl2', 'nl3osce', 'nl3meq', 'nl3longcase'];
+            const nlLabels = ['NL1', 'NL2', 'NL3 OSCE', 'NL3 MEQ', 'NL3 Longcase'];
+            const nlPass = [], nlFail = [];
 
-            exams.forEach(field => {
+            nlExams.forEach(field => {
                 const pass = data.filter(d => d[field] && d[field].startsWith('ผ่าน')).length;
                 const fail = data.filter(d => d[field] && d[field].startsWith('ไม่ผ่าน')).length;
-                passData.push(pass);
-                failData.push(fail);
+                nlPass.push(pass);
+                nlFail.push(fail);
             });
 
-            renderChart('chart-nl-stack', {
-                series: [{ name: 'ผ่าน', data: passData }, { name: 'ไม่ผ่าน', data: failData }],
-                chart: { type: 'bar', height: 300, stacked: true },
-                xaxis: { categories: labels },
-                colors: ['#22c55e', '#ef4444']
+            renderChart('chart-nl-detail', {
+                series: [{ name: 'ผ่าน', data: nlPass }, { name: 'ไม่ผ่าน', data: nlFail }],
+                chart: { type: 'bar', height: 320, stacked: true },
+                xaxis: { categories: nlLabels },
+                colors: ['#22c55e', '#ef4444'],
+                plotOptions: { bar: { columnWidth: '40%', borderRadius: 4 } },
+                legend: { position: 'top' }
             });
 
-            const yearGroups = {};
-            data.forEach(d => {
-                if(!d.stu_year) return;
-                if(!yearGroups[d.stu_year]) yearGroups[d.stu_year] = { pass: 0, total: 0 };
-                if(d.nl1 && (d.nl1.startsWith('ผ่าน') || d.nl1.startsWith('ไม่ผ่าน'))) {
-                    yearGroups[d.stu_year].total++;
-                    if(d.nl1.startsWith('ผ่าน')) yearGroups[d.stu_year].pass++;
+            // 3. Chart: CE Details (4 Parts)
+            const ceExams = ['ce1', 'ce2', 'ce3osce', 'ce3meq'];
+            const ceLabels = ['CE1', 'CE2', 'CE3 OSCE', 'CE3 MEQ'];
+            const cePass = [], ceFail = [];
+
+            ceExams.forEach(field => {
+                const pass = data.filter(d => d[field] && d[field].startsWith('ผ่าน')).length;
+                const fail = data.filter(d => d[field] && d[field].startsWith('ไม่ผ่าน')).length;
+                cePass.push(pass);
+                ceFail.push(fail);
+            });
+
+            renderChart('chart-ce-detail', {
+                series: [{ name: 'ผ่าน', data: cePass }, { name: 'ไม่ผ่าน', data: ceFail }],
+                chart: { type: 'bar', height: 320, stacked: true },
+                xaxis: { categories: ceLabels },
+                colors: ['#f97316', '#94a3b8'],
+                plotOptions: { bar: { columnWidth: '40%', borderRadius: 4 } },
+                legend: { position: 'top' }
+            });
+
+            // 4. Render Exam Table (New Section) 🔴
+            renderExamTable(data);
+        }
+
+        // ฟังก์ชันสร้างตารางผลสอบ (แยกออกมาเพื่อให้โค้ดสะอาด)
+       function renderExamTable(data) {
+            const tbody = document.getElementById('exam-table-body');
+            tbody.innerHTML = '';
+
+            // รายชื่อวิชาทั้งหมดที่ต้องเช็ค
+            const examFields = ['nl1', 'nl2', 'nl3osce', 'nl3meq', 'nl3longcase', 'ce1', 'ce2', 'ce3osce', 'ce3meq'];
+
+            // 1. กรองข้อมูลตาม Dropdown (Filter Logic) 🔴
+            let displayData = data.filter(d => {
+                if (examResultFilter === 'all') return true;
+
+                if (examResultFilter === 'fail') {
+                    // กฏ: เอาคนที่มีวิชาใดวิชาหนึ่งขึ้นต้นด้วย "ไม่ผ่าน"
+                    return examFields.some(field => d[field] && d[field].toString().startsWith('ไม่ผ่าน'));
                 }
-            });
-            const sortedYears = Object.keys(yearGroups).sort();
-            const rates = sortedYears.map(y => {
-                const g = yearGroups[y];
-                return g.total > 0 ? ((g.pass / g.total) * 100).toFixed(1) : 0;
+
+                if (examResultFilter === 'pass') {
+                    // กฏ: เอาคนที่มีวิชาใดวิชาหนึ่งขึ้นต้นด้วย "ผ่าน"
+                    return examFields.some(field => d[field] && d[field].toString().startsWith('ผ่าน'));
+                }
+                return true;
             });
 
-            renderChart('chart-cohort-nl1', {
-                series: [{ name: '% ผ่าน NL1', data: rates }],
-                chart: { type: 'line', height: 300 },
-                stroke: { curve: 'smooth', width: 3 },
-                xaxis: { categories: sortedYears },
-                colors: ['#6366f1'],
-                markers: { size: 5 }
+            // 2. เรียงลำดับ (Sorting: รุ่น -> ชื่อ)
+            displayData.sort((a, b) => {
+                const yearA = a.stu_year || '';
+                const yearB = b.stu_year || '';
+                const yearCompare = yearA.localeCompare(yearB, undefined, { numeric: true, sensitivity: 'base' });
+                if (yearCompare === 0) return (a.fullname || '').localeCompare(b.fullname || '', 'th');
+                return yearCompare;
             });
+
+            // 3. Pagination Logic
+            const totalItems = displayData.length;
+            const totalPages = Math.ceil(totalItems / rowsAcademic);
+
+            if (pageAcademic > totalPages && totalPages > 0) pageAcademic = totalPages;
+            if (pageAcademic < 1) pageAcademic = 1;
+
+            const startIdx = (pageAcademic - 1) * rowsAcademic;
+            const endIdx = startIdx + rowsAcademic;
+            const pageItems = displayData.slice(startIdx, endIdx);
+
+            // 4. Render Rows
+            const getBadge = (text) => {
+                if (!text || text === '-' || text === '') return '<span class="text-slate-300">-</span>';
+                if (text.toString().startsWith('ผ่าน')) return `<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-bold text-[10px] whitespace-nowrap">${text}</span>`;
+                if (text.toString().startsWith('ไม่ผ่าน')) return `<span class="px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-bold text-[10px] whitespace-nowrap">${text}</span>`;
+                return `<span class="text-slate-500">${text}</span>`;
+            };
+
+            if (pageItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-400">ไม่พบข้อมูลตามเงื่อนไข</td></tr>`;
+            } else {
+                pageItems.forEach(d => {
+                    const tr = `
+                        <tr class="hover:bg-slate-50 transition border-b border-slate-50 last:border-0">
+                            <td class="px-3 py-2 font-medium text-slate-600 sticky left-0 bg-white z-0 border-r border-slate-100 shadow-sm">${d.stu_year || '-'}</td>
+                            <td class="px-3 py-2 font-medium text-slate-800 sticky left-14 sm:left-16 bg-white z-0 border-r border-slate-100 shadow-sm whitespace-nowrap min-w-[150px]">${d.fullname || '-'}</td>
+                            
+                            <td class="px-2 py-2 text-center border-l border-slate-50">${getBadge(d.nl1)}</td>
+                            <td class="px-2 py-2 text-center border-l border-slate-50">${getBadge(d.nl2)}</td>
+                            <td class="px-2 py-2 text-center border-l border-slate-50">${getBadge(d.nl3osce)}</td>
+                            <td class="px-2 py-2 text-center border-l border-slate-50">${getBadge(d.nl3meq)}</td>
+                            <td class="px-2 py-2 text-center border-l border-slate-50 border-r border-slate-200 bg-slate-50/30">${getBadge(d.nl3longcase)}</td>
+
+                            <td class="px-2 py-2 text-center border-l border-slate-50">${getBadge(d.ce1)}</td>
+                            <td class="px-2 py-2 text-center border-l border-slate-50">${getBadge(d.ce2)}</td>
+                            <td class="px-2 py-2 text-center border-l border-slate-50">${getBadge(d.ce3osce)}</td>
+                            <td class="px-2 py-2 text-center border-l border-slate-50">${getBadge(d.ce3meq)}</td>
+                        </tr>
+                    `;
+                    tbody.insertAdjacentHTML('beforeend', tr);
+                });
+            }
+
+            // 5. Update Footer Controls
+            document.getElementById('table-info-academic').innerText = totalItems > 0 
+                ? `แสดง ${startIdx + 1}-${Math.min(endIdx, totalItems)} จาก ${totalItems} รายการ`
+                : 'ไม่พบข้อมูล';
+            document.getElementById('page-display-academic').innerText = `หน้า ${totalPages > 0 ? pageAcademic : 0} / ${totalPages}`;
+            document.getElementById('btn-prev-academic').disabled = pageAcademic === 1 || totalItems === 0;
+            document.getElementById('btn-next-academic').disabled = pageAcademic === totalPages || totalItems === 0;
         }
 
         // --- TAB 3 ---
         function renderTab3_Profile(data) {
-            const risks = data.filter(d => d.med_condition && d.med_condition !== '-' && d.med_condition.trim() !== '').length;
-            document.getElementById('kpi-health-risk').innerText = risks.toLocaleString();
-
-            const diseases = countByGroup(data, 'med_condition', 10);
-            renderChart('chart-diseases', {
-                series: [{ name: 'จำนวน', data: Object.values(diseases) }],
-                chart: { type: 'bar', height: 160 },
-                xaxis: { categories: Object.keys(diseases) },
-                plotOptions: { bar: { borderRadius: 4, columnWidth: '50%', horizontal: true } },
-                colors: ['#f43f5e']
+            // 1. Chart: Major (สาขา)
+            // นับจำนวนแยกตามสาขา (ไม่จำกัดจำนวน เพื่อให้เห็นครบ)
+            const majorCounts = countByGroup(data, 'major', 10);
+            
+            renderChart('chart-major', {
+                series: [{ name: 'จำนวน', data: Object.values(majorCounts) }],
+                chart: { type: 'bar', height: 350 }, // เพิ่มความสูงเพื่อให้กราฟไม่อัดแน่น
+                plotOptions: { 
+                    bar: { 
+                        horizontal: true, 
+                        borderRadius: 4,
+                        barHeight: '70%', // ปรับความอ้วนของแท่งกราฟ
+                        dataLabels: { position: 'center' } // ให้ตัวเลขอยู่ปลายแท่ง
+                    } 
+                },
+                xaxis: { categories: Object.keys(majorCounts) },
+                colors: ['#0ea5e9'], // สีฟ้า Sky
+                dataLabels: { 
+                    enabled: true,
+                    textAnchor: 'start',
+                    style: { colors: ['#fff'] },
+                    formatter: function (val, opt) {
+                        return val > 0 ? val : '';
+                    }
+                }
             });
+
+            // 2. Chart: University (มหาวิทยาลัย)
+            const uniCounts = countByGroup(data, 'university', 10);
+
+            renderChart('chart-university', {
+                series: [{ name: 'จำนวน', data: Object.values(uniCounts) }],
+                chart: { type: 'bar', height: 350 },
+                plotOptions: { 
+                    bar: { 
+                        horizontal: true, 
+                        borderRadius: 4,
+                        barHeight: '70%'
+                    } 
+                },
+                xaxis: { categories: Object.keys(uniCounts) },
+                colors: ['#8b5cf6'], // สีม่วง Violet
+                 dataLabels: { position: 'center' }
+            });
+
+            // 3. Render Table (เรียกใช้ฟังก์ชันเดิม)
             renderTable();
         }
 
@@ -670,23 +961,24 @@
             });
         }
 
-        function renderTable() {
+	function renderTable() {
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = '';
 
-            const matches = getTableMatches();
+            const matches = getTableMatches(); // ฟังก์ชันนี้เหมือนเดิม
             const totalItems = matches.length;
-            const totalPages = Math.ceil(totalItems / rowsPerPage);
+            const totalPages = Math.ceil(totalItems / rowsProfile); // ใช้ตัวแปร rowsProfile
             
-            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-            if (currentPage < 1) currentPage = 1;
+            if (pageProfile > totalPages && totalPages > 0) pageProfile = totalPages;
+            if (pageProfile < 1) pageProfile = 1;
 
-            const startIdx = (currentPage - 1) * rowsPerPage;
-            const endIdx = startIdx + rowsPerPage;
+            const startIdx = (pageProfile - 1) * rowsProfile;
+            const endIdx = startIdx + rowsProfile;
             const pageItems = matches.slice(startIdx, endIdx);
 
             pageItems.forEach(d => {
-                const tr = `
+                // ... (โค้ด Render tr เหมือนเดิมเป๊ะ ไม่ต้องแก้) ...
+                 const tr = `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-50 last:border-0">
                         <td class="px-6 py-4 text-slate-600 font-medium">${d.stu_year || '-'}</td>
                         <td class="px-6 py-4 font-mono text-slate-500 font-semibold">${d.student_id || '-'}</td>
@@ -695,21 +987,23 @@
                         <td class="px-6 py-4 text-slate-500 text-xs">${d.healthcare_rights || '-'}</td>
                         <td class="px-6 py-4 text-slate-500 text-xs">${d.scholarship_province || '-'}</td>
                         <td class="px-6 py-4 text-slate-500 text-xs">${d.major || '-'}</td>
-                        <td class="px-6 py-4 text-slate-500 text-xs">${d.advisor || '-'}</td>
+                        <td class="px-6 py-4 text-slate-500 text-xs">${d.university || '-'}</td>
                         <td class="px-6 py-4 text-center">
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(d.studystatus)} whitespace-nowrap">${d.studystatus || 'ไม่ระบุ'}</span>
                         </td>
                     </tr>
                 `;
+
                 tbody.insertAdjacentHTML('beforeend', tr);
             });
 
-            document.getElementById('table-info').innerText = totalItems > 0 
+            // Update Controls (เปลี่ยน ID เป็น profile)
+            document.getElementById('table-info-profile').innerText = totalItems > 0 
                 ? `แสดง ${startIdx + 1}-${Math.min(endIdx, totalItems)} จาก ${totalItems} รายการ`
                 : 'ไม่พบข้อมูล';
-            document.getElementById('page-display').innerText = `หน้า ${totalPages > 0 ? currentPage : 0} / ${totalPages}`;
-            document.getElementById('btn-prev').disabled = currentPage === 1 || totalItems === 0;
-            document.getElementById('btn-next').disabled = currentPage === totalPages || totalItems === 0;
+            document.getElementById('page-display-profile').innerText = `หน้า ${totalPages > 0 ? pageProfile : 0} / ${totalPages}`;
+            document.getElementById('btn-prev-profile').disabled = pageProfile === 1 || totalItems === 0;
+            document.getElementById('btn-next-profile').disabled = pageProfile === totalPages || totalItems === 0;
         }
 
         // --- UTILS ---
